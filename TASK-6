@@ -1,0 +1,64 @@
+#SMS SPAM DETECTION 
+
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the dataset (replace 'spam.csv' with your dataset path)
+try:
+    data = pd.read_csv('spam.csv', encoding='latin-1', on_bad_lines='skip')
+except FileNotFoundError:
+    print("Error: 'spam.csv' not found. Please ensure the file exists in the same directory as the script.")
+    exit()
+except pd.errors.ParserError as e:
+    print(f"Error parsing 'spam.csv': {e}")
+    exit()
+
+# Explore the dataset
+print(data.head())
+
+# Preprocess the dataset
+data = data[['v1', 'v2']]
+data.columns = ['label', 'message']
+data['label'] = data['label'].map({'ham': 0, 'spam': 1})
+
+# Split the dataset
+X = data['message']
+y = data['label']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Vectorize the text data
+vectorizer = CountVectorizer()
+X_train_vectorized = vectorizer.fit_transform(X_train)
+X_test_vectorized = vectorizer.transform(X_test)
+
+# Train the model
+model = MultinomialNB()
+model.fit(X_train_vectorized, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test_vectorized)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+report = classification_report(y_test, y_pred)
+
+print(f"Accuracy: {accuracy:.2f}")
+print("\nConfusion Matrix:")
+print(conf_matrix)
+print("\nClassification Report:")
+print(report)
+
+# Visualize the confusion matrix
+plt.figure(figsize=(8, 6))
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=['Ham', 'Spam'], yticklabels=['Ham', 'Spam'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
