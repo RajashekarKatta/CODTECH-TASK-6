@@ -1,4 +1,4 @@
-
+Name:RAJASHEKAR KATTA Company:CODETECH IT SOLUTIONS ID: CT08DBJ Domain:Python Programming
 
 Data Loading:
 The script loads a CSV file (spam.csv) that contains two main columns: one for the label (ham or spam) and another for the email content (messages).
